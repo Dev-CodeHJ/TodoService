@@ -55,7 +55,6 @@ class TodoServiceTest {
     @DisplayName("Read 테스트")
     void retrieve() {
         System.out.println("-- Read 테스트 시작 --");
-        System.out.println("");
 
         TodoEntity entity = new TodoEntity("system-uuid","gnlwls0127","New Post1",false);
 
