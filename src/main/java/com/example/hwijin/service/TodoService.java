@@ -4,11 +4,9 @@ package com.example.hwijin.service;
 import com.example.hwijin.model.TodoEntity;
 import com.example.hwijin.persistence.TodoRepository;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Id;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,29 +49,30 @@ public class TodoService {
         return repository.findByUserId(userId);
     }
 
-    public List<TodoEntity> update(final TodoEntity entity) throws Exception {
+    public String update(final TodoEntity entity) throws Exception {
 
         validate(entity);
 
         Optional<TodoEntity> findEntity = repository.findById(entity.getId());
+
         if (findEntity.isPresent()) {
             TodoEntity result = repository.save(entity);
-            return repository.findByUserId(result.getUserId());
+            return result.getId()+"가 업데이트되었습니다.";
         }else {
-            throw new RuntimeException("Entity cannot be null.");
+            throw new RuntimeException("업데이트할 행이 없습니다.");
         }
     }
 
-    public List<TodoEntity> delete(final TodoEntity entity) {
+    public String delete(final TodoEntity entity) {
 
         Optional<TodoEntity> findEntity = repository.findById(entity.getId());
 
         if (findEntity.isPresent()) {
             TodoEntity result = findEntity.get();
-            repository.delete(result);
-            return repository.findByUserId(result.getUserId());
+            repository.deleteById(result.getId());
+            return result.getId()+"가 삭제되었습니다.";
         } else {
-            throw new RuntimeException("Entity cannot be null.");
+            throw new RuntimeException("삭제할 행이 없습니다.");
         }
     }
 
