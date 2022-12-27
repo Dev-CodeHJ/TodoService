@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +51,6 @@ public class TodoService {
     }
 
     public String update(final TodoEntity entity) throws Exception {
-
         validate(entity);
 
         Optional<TodoEntity> findEntity = repository.findById(entity.getId());
@@ -71,6 +71,17 @@ public class TodoService {
             TodoEntity result = findEntity.get();
             repository.deleteById(result.getId());
             return result.getId()+"가 삭제되었습니다.";
+        } else {
+            throw new RuntimeException("삭제할 행이 없습니다.");
+        }
+    }
+
+    public String delete2(String id) {
+        Optional<TodoEntity> foundEntity = repository.findById(id);
+        if(foundEntity.isPresent()){
+            repository.deleteById(id);
+            return id+"가 삭제되었습니다.";
+
         } else {
             throw new RuntimeException("삭제할 행이 없습니다.");
         }

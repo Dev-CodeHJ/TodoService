@@ -13,22 +13,29 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
 @SpringBootTest
 class TodoServiceTest {
 
     @Autowired
     private TodoRepository repository;
 
+    @Autowired
+    private TodoService service;
+
     @BeforeEach
     void setUp() {
         System.out.println("-- BeforeEach 어노테이션 호출 --");
-        repository.deleteAll();
     }
 
     @AfterEach
@@ -42,26 +49,28 @@ class TodoServiceTest {
     @Test
     @DisplayName("Create 테스트")
     void create() {
+        System.out.println("-- Create 테스트 시작 --");
 
         //given
-//        TodoEntity entity = new TodoEntity("system-uuid","gnlwls0127","New Post1",false);
-        TodoEntity entity = TodoEntity.builder()
-                .id("system-uuid")
-                .userId("Test-userId")
-                .title("new Title")
+        TodoEntity entity1 = TodoEntity.builder()
+                .userId("Test UserId1")
+                .title("New Title1")
+                .done(true)
+                .build();
+
+        TodoEntity entity2 = TodoEntity.builder()
+                .userId("Test UserId2")
+                .title("New Title2")
                 .done(true)
                 .build();
 
         //when
-        TodoEntity result = repository.save(entity);
+        TodoEntity createdEntity1 = service.create(entity1);
+        TodoEntity createdEntity2 = service.create(entity2);
 
         //then
-
-
-
-//        assertEquals();//jupiter
-//        assertThat()//core
-        assertEquals("new Title0", entity.getTitle());
+        assertEquals(createdEntity1.getTitle(), entity1.getTitle());
+        assertEquals(createdEntity2.getTitle(), entity2.getTitle());
     }
 
     @Test
@@ -69,28 +78,86 @@ class TodoServiceTest {
     void retrieve() {
         System.out.println("-- Read 테스트 시작 --");
 
-        TodoEntity entity = new TodoEntity("system-uuid","gnlwls0127","New Post1",false);
+        //given
+        TodoEntity entity1 = TodoEntity.builder()
+                .userId("Test UserId")
+                .title("New Title1")
+                .done(true)
+                .build();
+        repository.save(entity1);
+
+        TodoEntity entity2 = TodoEntity.builder()
+                .userId("Test UserId")
+                .title("New Title2")
+                .done(false)
+                .build();
+        repository.save(entity2);
+
+        //when
+        List<TodoEntity> entityList = service.retrieve("Test-UserId");
+
+        //then
+        assertEquals(2,entityList.size());
 
     }
 
     @Test
     void update() {
-        TodoEntity entity = new TodoEntity();
-        TodoEntity result = repository.save(entity);
-        System.out.println(result);
+        System.out.println("-- Update 테스트 시작 --");
 
-        Optional<TodoEntity> foundEntity = repository.findById("asflj12o3fjkl2jfl1k2fjsdaflskd");
+        //given
+        TodoEntity entity = TodoEntity.builder()
+                .userId("Test UserId")
+                .title("New Title")
+                .done(true)
+                .build();
+        repository.save(entity);
 
-        if (foundEntity.isPresent()) {
-            TodoEntity en = foundEntity.get();
-            System.out.println("has Value");
-        } else {
-            throw new RuntimeException("Entity cannot be null.");
+        entity.setUserId("Update Id");
+        entity.setTitle("Update Title");
+        entity.setDone(false);
+
+        //when
+        try {
+            String updatedEntity = service.update(entity);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
+        //then
+
     }
 
     @Test
     void delete() {
+        System.out.println("-- Delete 테스트 시작 --");
+
+        //given
+
+
+        //when
+
+
+        //then
 
     }
+    @Test
+    void test() {
+        System.out.println("Test");
+
+        TodoEntity entity1 = TodoEntity.builder()
+                .userId("Test-UserId1")
+                .title("New Title1")
+                .done(true)
+                .build();
+
+        TodoEntity createdEntity = service.create(entity1);
+
+        String getId = createdEntity.getId();
+        service.delete2(getId);
+
+
+        Assertions.assertNull(createdEntity);
+    }
+
 }

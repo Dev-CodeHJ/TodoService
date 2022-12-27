@@ -97,7 +97,7 @@ public class TodoController {
 //            List<TodoEntity> entities = service.delete(entity);
 //            List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
 //            ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
-            String result = service.delete(entity);
+            String result = service.delete2(entity.getId());
 
             return ResponseEntity.ok().body(result);
         }
